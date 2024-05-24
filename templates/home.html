@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+    {% include 'partials/_header.html' %}
+    <div class="container mx-auto px-4 mt-8 min-h-screen">
+        <form method="POST" action="/">
+            <input type="text" name="youtube_url" placeholder="Enter YouTube URL" class="border p-2 w-full">
+            <button type="submit" class="bg-blue-500 text-white p-2 mt-2">Validate</button>
+        </form>
+        {% if message %}
+            <p class="mt-4">{{ message }}</p>
+        {% endif %}
+        {% if video_streams %}
+            <h2 class="mt-4">Download Video:</h2>
+            <ul>
+                {% for stream in video_streams %}
+                    <li><a href="/download?url={{ stream.url }}&type=video" class="text-blue-500">{{ stream.resolution }} - MP4</a></li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% if audio_streams %}
+            <h2 class="mt-4">Download Audio:</h2>
+            <ul>
+                {% for stream in audio_streams %}
+                    <li><a href="/download?url={{ stream.url }}&type=audio" class="text-blue-500">MP3</a></li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    {% include 'partials/_footer.html' %}
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
