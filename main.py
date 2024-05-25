@@ -25,7 +25,12 @@ def home_route():
                 message = f"This is a valid YouTube link. Video title: {video_title}"
                 return render_template("home.html", message=message, video_streams=video_streams, audio_streams=audio_streams, youtube_url=youtube_url)
             except Exception as e:
-                message = f"Failed to fetch video details: {str(e)}"
+                if "429" in str(e):
+                    message = "Failed to fetch video details: Too many requests. Please try again later."
+                    logger.error(f"Error fetching video details: {str(e)}")
+                else:
+                    message = f"Failed to fetch video details: {str(e)}"
+                    logger.error(f"Error fetching video details: {str(e)}")
         else:
             message = "Please enter a valid YouTube link."
         return render_template("home.html", message=message)
@@ -50,9 +55,8 @@ def download():
         output_path = stream.download()
         return send_file(output_path, as_attachment=True)
     except Exception as e:
-        logger.error(f"Error downloading the stream: {str(e)}")
-        return f"Error downloading the stream: {str(e)}"
-    except Exception as e:
+        if "429" in str(e):
+            return "Failed to download: Too many requests. Please try again later."
         logger.error(f"Error downloading the stream: {str(e)}")
         return f"Error downloading the stream: {str(e)}"
 
