@@ -4,6 +4,7 @@ from flask import Flask, render_template
 import re
 import os
 from pytube import YouTube
+from flask import send_file
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -40,12 +41,33 @@ def is_valid_youtube_url(url):
 def download():
     url = request.args.get('url')
     type = request.args.get('type')
-    yt = YouTube(url)
-    if type == 'video':
-        stream = yt.streams.filter(progressive=True, file_extension='mp4').first()
-    else:
-        stream = yt.streams.filter(only_audio=True).first()
-    return stream.download()
+    try:
+        yt = YouTube(url)
+        if type == 'video':
+            stream = yt.streams.filter(progressive=True, file_extension='mp4').first()
+        else:
+            stream = yt.streams.filter(only_audio=True).first()
+        output_path = stream.download()
+        return send_file(output_path, as_attachment=True)
+    except Exception as e:
+        logger.error(f"Error downloading the stream: {str(e)}")
+        return f"Error downloading the stream: {str(e)}"
+    except Exception as e:
+        logger.error(f"Error downloading the stream: {str(e)}")
+        return f"Error downloading the stream: {str(e)}"
+#     def __init__(self, app, options=None):
+#         self.application = app
+#         self.options = options or {}
+#         super().__init__()
+# 
+#     def load_config(self):
+#         # Apply configuration to Gunicorn
+#         for key, value in self.options.items():
+#             if key in self.cfg.settings and value is not None:
+#                 self.cfg.set(key.lower(), value)
+# 
+#     def load(self):
+#         return self.application
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
